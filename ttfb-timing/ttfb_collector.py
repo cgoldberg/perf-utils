@@ -27,6 +27,8 @@ def log_success(human_time, epoch, url, ttfb):
 
 
 def get_xuetang_api_url(url):
+    human_time = time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime())
+    epoch = time.time()
     try:
         resp = urllib2.urlopen(url)
         data = resp.read()

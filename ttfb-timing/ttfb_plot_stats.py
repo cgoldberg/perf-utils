@@ -3,27 +3,26 @@
 import csv
 import urlparse
 
+from bokeh.plotting import figure, output_file, show, VBox
 import numpy as np
-from bokeh.plotting import *
 
-
-input = 'results-china3.log'
 
 class Stats:
 
     def __init__(self, csv_file):
         self.loaded_stats = []
-        with open(input) as f:
+        with open(csv_file) as f:
             for i, row in enumerate(csv.reader(f)):
                 if i == 0:
                     epoch_time = float(row[1])
                 elapsed_time = float(row[1]) - float(epoch_time)
-                url = row[2]
+                original_url = row[2]
                 timer = float(row[3])
-                print timer
-                self._load_stat(url, elapsed_time, timer)
-        self.unique_urls = list(set(urlparse.urlparse(stat[0]).path.strip() for stat in self.loaded_stats))
-        self.unique_url_netlocs = [urlparse.urlparse(url).netloc for url in self.unique_urls]
+                self._load_stat(original_url, elapsed_time, timer)
+        self.unique_urls = list(set(urlparse.urlparse(stat[0]).path.strip() for
+                                    stat in self.loaded_stats))
+        self.unique_url_netlocs = [urlparse.urlparse(url).netloc
+                                   for url in self.unique_urls]
 
     def _load_stat(self, url, elapsed_time, timer):
         self.loaded_stats.append((url, elapsed_time, timer))
@@ -62,17 +61,16 @@ class Stats:
                        plot_width=width,
                        plot_height=height,
                        y_range=[0.0, 4000.0],
-                       x_axis_label = 'elapsed time in test (seconds)',
-                       y_axis_label = 'ttfb latency (milliseconds)',
-                      )
+                       x_axis_label='elapsed time in test (seconds)',
+                       y_axis_label='ttfb latency (milliseconds)',
+                       )
             p.scatter(x, y, color='blue')
             vbox.children.append(p)
         show(vbox)
 
 
 if __name__ == '__main__':
-    csv_file = 'results-china2.csv'
+    csv_file = 'results-china3.log'
     stats = Stats(csv_file)
     stats.print_stats_report()
     stats.plot_to_html()
-
