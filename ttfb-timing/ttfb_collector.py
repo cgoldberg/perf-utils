@@ -35,13 +35,18 @@ def get_xuetang_api_url(url):
         resp.close()
     except urllib2.HTTPError as e:
         log_error(human_time, epoch, url, e.code)
-        return None
+        source_url = None
     except urllib2.URLError as e:
         log_error(human_time, epoch, url, e.reason)
-        return None
+        source_url = None
     else:
-        json_data = json.loads(data)
-        return json_data[u'sources'][0]
+        try:
+            json_data = json.loads(data)
+            source_url = json_data[u'sources'][0]
+        except Exception as e:
+            log_error(human_time, epoch, url, e)
+            source_url = None
+    return source_url
 
 
 def get_ttfb(url):
@@ -51,7 +56,6 @@ def get_ttfb(url):
     try:
         resp = urllib2.urlopen(url)
         resp.read(1)
-        print resp.info()
         resp.close()
     except urllib2.HTTPError as e:
         log_error(human_time, epoch, url, e.code)
