@@ -35,10 +35,13 @@ def get_xuetang_api_url(url):
         resp.close()
     except urllib2.HTTPError as e:
         log_error(human_time, epoch, url, e.code)
+        return None
     except urllib2.URLError as e:
         log_error(human_time, epoch, url, e.reason)
-    json_data = json.loads(data)
-    return json_data[u'sources'][0]
+        return None
+    else:
+        json_data = json.loads(data)
+        return json_data[u'sources'][0]
 
 
 def get_ttfb(url):
@@ -48,6 +51,7 @@ def get_ttfb(url):
     try:
         resp = urllib2.urlopen(url)
         resp.read(1)
+        print resp.info()
         resp.close()
     except urllib2.HTTPError as e:
         log_error(human_time, epoch, url, e.code)
@@ -65,7 +69,9 @@ if __name__ == '__main__':
         urls.append('http://video.study.163.com/edu-video/nos/mp4/2014/06/23/460097_hd.mp4')
         urls.append('http://d2f1egay8yehza.cloudfront.net/TSGCMATH/TSGCMATHT314-V000400_DTH.mp4')
         lookup_url = 'http://api.xuetangx.com/edx/video?s3_url=https://s3.amazonaws.com/edx-course-videos/mit-600x/M-600X-FA12-L3-Intro_100.mp4'
-        urls.append(get_xuetang_api_url(lookup_url))
+        video_url = get_xuetang_api_url(lookup_url)
+        if video_url is not None:
+            urls.append(video_url)
         for url in urls:
             get_ttfb(url)
         time.sleep(TIME_INTERVAL)
